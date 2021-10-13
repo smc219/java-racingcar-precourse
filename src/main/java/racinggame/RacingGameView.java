@@ -1,9 +1,13 @@
 package racinggame;
 
 import nextstep.utils.Console;
+import racinggame.wrapper.GameNumbers;
+import racinggame.wrapper.Notification;
 
 public class RacingGameView {
 	RacingGameController racingGameController;
+	Notification notification = new Notification();
+	GameNumbers gameNumbers;
 
 	public RacingGameView() {
 		this.racingGameController = new RacingGameController(this);
@@ -14,37 +18,38 @@ public class RacingGameView {
 			Integer.parseInt(num);
 			return true;
 		} catch (NumberFormatException e) {
-			System.out.println("[ERROR] 숫자를 입력해주세요.");
 			return false;
 		}
 	}
 
 	public void receiveCarName() {
-		System.out.println("경주할 자동차 이름을 입력하세요.(이름은 쉼표(,) 기준으로 구분)");
+		System.out.println(notification.getRequestToEnterCarName());
 		String input = Console.readLine();
 		boolean result = racingGameController.findCarName(input);
 		while (!result) {
-			System.out.println("[ERROR] 각 차량의 이름은 5자 이하입니다.\n경주할 자동차 이름을 입력하세요.(이름은 쉼표(,) 기준으로 구분)");
+			System.out.println(notification.getWrongCarNameNotification());
+			System.out.println(notification.getRequestToEnterCarName());
 			input = Console.readLine();
 			result = racingGameController.findCarName(input);
 		}
 	}
 
-	public int receiveTry() {
-		System.out.print("시도할 횟수는 몇회인가요? : ");
+	public GameNumbers receiveTry() {
+		System.out.print(notification.getRequestToEnterTryNumber());
 		String tryNumber = Console.readLine();
 		while (!validateIsDigit(tryNumber)) {
-			System.out.println("시도할 횟수는 몇회인가요?");
+			System.out.println(notification.getWrongTryNumberNotification());
+			System.out.println(notification.getRequestToEnterTryNumber());
 			tryNumber = Console.readLine();
 		}
-		return Integer.parseInt(tryNumber);
+		return new GameNumbers(Integer.parseInt(tryNumber));
 	}
 
 	public void inputCarName() {
 		receiveCarName();
-		int tryNumber = receiveTry();
-		System.out.println("\n실행결과");
-		racingGameController.runGame(tryNumber);
+		gameNumbers = receiveTry();
+		System.out.println(notification.getNotificationToBegin());
+		racingGameController.runGame(gameNumbers.getTryNumber());
 	}
 
 	public void printResult(String resultSentence) {
